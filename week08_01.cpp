@@ -1,130 +1,48 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+#include <queue>
 #include <string>
-#include <string.h>
 
-#define MAX_QUEUE_SIZE 5
+using namespace std;
 
-typedef std::string string;
-typedef char* element; // ¿ä¼ÒÀÇ Å¸ÀÔ
-typedef struct QueueNode { // Å¥ÀÇ ³ëµåÀÇ Å¸ÀÔ
-	element data;
-	struct QueueNode* link;
-} QueueNode;
-typedef struct {
-	QueueNode* front, * rear;
-} LinkedQueueType;
-
-// ¿À·ù ÇÔ¼ö
-void error(const char* message) {
-	fprintf(stderr, "%s\n", message);
-	exit(1);
-}
-// Å¥ ÃÊ±âÈ­
-void init_queue(LinkedQueueType* q) {
-	q->front = NULL;
-	q->rear = NULL;
-}
-// ºñ¾ú´ÂÁö È®ÀÎ
-int is_empty(LinkedQueueType* q) {
-	return (q->front == NULL);
-}
-
-void queue_print(LinkedQueueType* q) {
-	printf(" | ");
-	for (QueueNode* p = q->front; p != NULL; p = p->link) {
-		printf("%s | ", p->data);
-	}
-	printf("\n");
-}
-
-// »ðÀÔ ÇÔ¼ö
-void enqueue(LinkedQueueType* q, element data) {
-	QueueNode* temp = (QueueNode*)malloc(sizeof(QueueNode));
-	if (temp == NULL)
-		error("¸Þ¸ð¸® ÇÒ´ç ¿¡·¯");
-	temp->data = data; // µ¥ÀÌÅÍ ÀúÀå
-	temp->link = NULL; // ¸µÅ© ÇÊµå¸¦ NULL
-	if (is_empty(q)) { // Å¥°¡ °ø¹éÀÌ¸é
-		q->front = temp;
-		q->rear = temp;
-	}
-	else { // Å¥°¡ °ø¹éÀÌ ¾Æ´Ï¸é
-		q->rear->link = temp; // ¼ø¼­°¡ Áß¿ä
-		q->rear = temp;
-	}
-}
-
-// »èÁ¦ ÇÔ¼ö
-element dequeue(LinkedQueueType* q) {
-	QueueNode* temp = q->front;
-	element data;
-	if (is_empty(q)) {// °ø¹é»óÅÂ
-		error("Å¥°¡ °ø¹é»óÅÂÀÔ´Ï´Ù.");
-	}
-	data = temp->data; // µ¥ÀÌÅÍ¸¦ ²¨³½´Ù.
-	q->front = q->front->link; // front·Î ´ÙÀ½³ëµå
-	if (q->front == NULL) // Å¥°¡ ºñ¾ú´Ù¸é
-		q->rear = NULL;
-	free(temp); // µ¿Àû ¸Þ¸ð¸® ÇØÁ¦
-	return data; // µ¥ÀÌÅÍ ¹ÝÈ¯
-}
-
-// ³ëÆ®°¡ º¹¿ø °¡´ÉÇÏ¸é 1, ºÒ°¡´ÉÇÏ¸é 0À» return 
-int possible(LinkedQueueType friends[], LinkedQueueType* list, int fnum) {
-	while (true) {
-		bool is = false;
-		element word = dequeue(list);
-		for (int i = 0; i < fnum; i++) {
-			if (friends[i].front->data == word) {
-				is = true;
-				dequeue(&friends[i]);
-			}
-		}
-		if (is == false)
-			return 0;
-	}
-	return 1;
-}
+// 202313705 ë‚¨ê¶ìˆ˜ë¯¼
 
 int main() {
-	LinkedQueueType list;
-	init_queue(&list); // Å¥ ÃÊ±âÈ­
+	int problem_num, student_num, word_num = 0;
+	cin >> problem_num;
 
-	//Å×½ºÆ® ÄÉÀÌ½º ¼ö
-	int T = 0;
-	scanf("%d", &T);
+	for (int problem = 0; problem < problem_num; problem++) {
+		cin >> student_num >> word_num;
 
-	while (T > 0) {
-		//Ä£±¸ÀÇ ¼ö, ¹®ÀåÀÇ ´Ü¾î °¹¼ö
-		int N = 0;
-		int M = 0;
-		scanf("%d %d", &N, &M);
-
-		//¹®Àå
-		char str[100] = "";
-		scanf("%s", str);
-		char* splited = strtok(str, " ");
-		for (int i = 0; i < M; i++)
-			enqueue(&list, (element)splited[i]);
-
-		//Ä£±¸µéÀÇ ¹®Àå
-		LinkedQueueType friends[100];
-		for (int i = 0; i < 100; i++)
-			init_queue(&friends[i]);
-		for (int i = 0; i < N; i++) {
-			int k = 0;
-			char str1[100] = "";
-			scanf("%d %s", &k, str1);
-			char* splited1 = strtok(str1, " ");
-			for (int j = 0; j < k; j++)
-				enqueue(&friends[i], (element)splited1[j]);
+		string* sentence = new string[word_num];
+		for (int word = 0; word < word_num; word++) {
+			cin >> sentence[word];
 		}
 
-		printf("%d\n", possible(friends, &list, N));
+		queue<string>* queue_array = new queue<string>[student_num];
+		for (int student = 0; student < student_num; student++) {
+			int input_num;
+			cin >> input_num;
+			for (int input = 0; input < input_num; input++) {
+				string word;
+				cin >> word;
+				queue_array[student].push(word);
+			}
+		}
 
-		T--;
+		bool is_existed = false;
+		for (int word = 0; word < word_num; word++) {
+			is_existed = false;
+			for (int student = 0; student < student_num; student++) {
+				if (sentence[word] == queue_array[student].front()) {
+					queue_array[student].pop();
+					is_existed = true;
+				}
+			}
+			if (!is_existed) {
+				break;
+			}
+		}
+		cout << (is_existed ? "1" : "0") << "\n";
+		delete[] queue_array;
 	}
-	return 0;
 }
